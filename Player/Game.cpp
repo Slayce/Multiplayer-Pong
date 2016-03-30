@@ -9,8 +9,8 @@ _fps(fps),
 _window(sf::VideoMode(window_width, window_height), "Pong", sf::Style::Close | sf::Style::Titlebar),
 _is_game_ended(false),
 _thread_receive_data(&Game::receive_data, this),
-_thread_send_inputs(&Game::read_inputs, this),
-_thread_read_inputs(&Game::send_inputs, this)
+_thread_send_inputs(&Game::send_inputs, this),
+_thread_read_inputs(&Game::read_inputs, this)
 {}
 
 void Game::init()
@@ -25,8 +25,8 @@ void Game::init()
 void Game::launch()
 {
 	_thread_receive_data.launch();
-	//_thread_send_inputs.launch();
-	//_thread_read_inputs.launch();
+	_thread_send_inputs.launch();
+	///_thread_read_inputs.launch();
 
 	while (!_is_game_ended)
 	{
@@ -35,7 +35,7 @@ void Game::launch()
 			display();
 			_main_clock.restart();
 			read_inputs();
-			send_inputs();
+			//send_inputs();
 		}
 	}
 	gameEnded(_win_or_lose);
@@ -119,7 +119,7 @@ void Game::display()
 
 void Game::read_inputs()
 {
-	//while (!_is_game_ended)
+	///while (!_is_game_ended)
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) //flèche gauche : déplacement du vaisseau à gauche si il n'est pas sur le bord gauche de l'écran
 		{
@@ -146,7 +146,7 @@ void Game::read_inputs()
 
 void Game::send_inputs()
 {
-	//while (!_is_game_ended)
+	while (!_is_game_ended)
 	{
 		if (_last_input.key.code != sf::Keyboard::Unknown)
 		{
