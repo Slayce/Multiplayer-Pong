@@ -77,13 +77,13 @@ void Game::receive_data()
 
 		sf::Lock lock(_mutex);
 
-		if (data_received.win_or_lose == 0) //si ce sont des données du jeu en cours
+		if (data_received.win_or_lose == 0) //si ce sont des donnÃ©es du jeu en cours
 		{
 			_ball = data_received.ball;
 			_racket_one = data_received.racket_one;
 			_racket_two = data_received.racket_two;
 		}
-		else //si le jeu est terminé
+		else //si le jeu est terminÃ©
 		{
 			_is_game_ended = true;
 			switch (data_received.win_or_lose)
@@ -118,30 +118,27 @@ void Game::display()
 
 void Game::read_inputs()
 {
-	///while (!_is_game_ended)
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) //flÃ¨che gauche : dÃ©placement du vaisseau Ã  gauche si il n'est pas sur le bord gauche de l'Ã©cran
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) //flèche gauche : déplacement du vaisseau à gauche si il n'est pas sur le bord gauche de l'écran
-		{
-			_last_input.key.code = sf::Keyboard::Left;
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) //flèche droite : déplacement du vaisseau à doite si il n'est pas sur le bord droit de l'écran
-		{
-			_last_input.key.code = sf::Keyboard::Right;
-		}
-
-		sf::Event event;
-		while (_window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)  //clic sur la croix en haut à droite : fenêtre fermée
-			{
-				_window.close();
-				_is_game_ended = true;
-			}
-		}
-
-		_sleep(1);
+		_last_input.key.code = sf::Keyboard::Left;
 	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) //flÃ¨che droite : dÃ©placement du vaisseau Ã  doite si il n'est pas sur le bord droit de l'Ã©cran
+	{
+		_last_input.key.code = sf::Keyboard::Right;
+	}
+
+	sf::Event event;
+	while (_window.pollEvent(event))
+	{
+		if (event.type == sf::Event::Closed)  //clic sur la croix en haut Ã  droite : fenÃªtre fermÃ©e
+		{
+			_window.close();
+			_is_game_ended = true;
+		}
+	}
+
+	_sleep(1);
 }
 
 void Game::send_inputs()
