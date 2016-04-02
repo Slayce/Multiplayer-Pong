@@ -26,7 +26,7 @@ void Game::launch()
 {
 	_thread_receive_data.launch();
 	_thread_send_inputs.launch();
-	///_thread_read_inputs.launch();
+	_thread_read_inputs.launch();
 
 	while (!_is_game_ended)
 	{
@@ -35,7 +35,6 @@ void Game::launch()
 			display();
 			_main_clock.restart();
 			read_inputs();
-			//send_inputs();
 		}
 	}
 	gameEnded(_win_or_lose);
@@ -140,6 +139,7 @@ void Game::read_inputs()
 				_is_game_ended = true;
 			}
 		}
+
 		_sleep(1);
 	}
 }
