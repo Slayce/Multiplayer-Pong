@@ -145,7 +145,7 @@ void Game::update()
 
 void Game::move_rackets()
 {
-	//sf::Lock lock(_mutex);
+	
 	if (_last_inputs_one.key.code != sf::Keyboard::Unknown)
 	{
 		switch (_last_inputs_one.key.code)  //on déplace la raquette 1
@@ -181,13 +181,11 @@ void Game::move_rackets()
 
 void Game::move_ball()
 {
-	//sf::Lock lock(_mutex);
 	_ball.move_ball();
 }
 
 void Game::check_collisions()
 {
-	//sf::Lock lock(_mutex);
 	if (_collision_clock.getElapsedTime().asMilliseconds() >= 10) //on check les collisions toutes les secondes pour éviter les zig-zags
 	{
 		if (_ball.getGlobalBounds().intersects(_racket_one.getGlobalBounds()))
@@ -229,8 +227,6 @@ void Game::read_inputs() //récupère les données envoyées par les players
 	{
 		NetworkManager::InputReceived received_input = _network_manager.receive_input();
 
-		//sf::Lock lock(_mutex);
-
 		if (received_input.event_key_pressed.key.code != sf::Keyboard::Unknown)
 		{
 			switch (received_input.player)
@@ -251,7 +247,6 @@ void Game::send_data()
 {
 	while (!_is_threads_terminated)
 	{
-		//sf::Lock lock(_mutex);
 		_network_manager.send_data(_ball, _racket_one, _racket_two);
 		
 		_sleep(1);
