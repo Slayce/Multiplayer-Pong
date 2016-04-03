@@ -7,8 +7,7 @@ Game::Game(Port local_tcp_port, Port local_udp_port, Vector2fSurcharged rackets_
 _racket_one(rackets_dimensions, default_rackets_speed),
 _racket_two(rackets_dimensions, default_rackets_speed),
 _ball(ball_radius, default_ball_direction, default_ball_speed),
-_is_game_ended(false),
-_is_threads_terminated(false),
+_is_game_continued(false),
 _window_dimensions(window_width, window_height),
 _network_manager(local_tcp_port, local_udp_port),
 _thread_read_inputs(&Game::read_inputs, this),
@@ -17,9 +16,14 @@ _thread_send_data(&Game::send_data, this)
 
 void Game::init()
 {
-	_network_manager.connect(); //recherche de deux joueurs
+	if (!_is_game_continued)
+	{
+		_network_manager.connect(); //recherche de deux joueurs
+		choose_color();
+	}
 
-	choose_color();
+	_is_game_ended = false;
+	_is_threads_terminated = false;
 
 	_ball.set_position((_window_dimensions.x / 2) - _ball.getRadius(), _window_dimensions.y / 2);
 
@@ -43,10 +47,13 @@ void Game::lauch()
 	{
 		update();
 		check_collisions();
+		///send_data();
+		///read_inputs();
 		check_goal();
-
-		_sleep(1);
 	}
+
+	_thread_read_inputs.terminate();
+	_thread_send_data.terminate();
 }
 
 void Game::choose_color()
@@ -209,14 +216,14 @@ void Game::check_goal()
 	if (_ball.getPosition().y + (_ball.getRadius() * 2) >= _window_dimensions.y) //si la balle est dans le camp de P1
 	{
 		_is_threads_terminated = true;
-		_network_manager.send_win(NetworkManager::Player2);
+		_is_game_continued = _network_manager.send_win(NetworkManager::Player2);
 		_is_game_ended = true;
 	}
 		
 	if (_ball.getPosition().y <= 0) //si la balle est dans le camp de P2
 	{
 		_is_threads_terminated = true;
-		_network_manager.send_win(NetworkManager::Player1);
+		_is_game_continued = _network_manager.send_win(NetworkManager::Player1);
 		_is_game_ended = true;
 	}
 }

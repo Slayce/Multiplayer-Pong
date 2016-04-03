@@ -106,7 +106,7 @@ void NetworkManager::send_data(Ball const &ball, Racket const &racket_one, Racke
 		cout << "Data were not sent to P2" << endl;
 }
 
-void NetworkManager::send_win(NetworkManager::Players winner)
+bool NetworkManager::send_win(NetworkManager::Players winner)
 {
 	_client_one_tcp.setBlocking(false);
 	_client_two_tcp.setBlocking(false);
@@ -120,12 +120,16 @@ void NetworkManager::send_win(NetworkManager::Players winner)
 	winner_packet << which_data << ball << racket1 << racket2 << win;
 	loser_packet << which_data << ball << racket1 << racket2 << lose;
 
+	sf::Clock timeout;
+
+	timeout.restart();
+
 	sf::Packet feedback1, feedback2;
 
 	switch (winner)
 	{
 	case Player1: //si P1 a gagné
-		while (_client_one_tcp.receive(feedback1) != sf::Socket::Done || _client_two_tcp.receive(feedback2) != sf::Socket::Done)
+		while (timeout.getElapsedTime().asSeconds() < 15 && (_client_one_tcp.receive(feedback1) != sf::Socket::Done || _client_two_tcp.receive(feedback2) != sf::Socket::Done)) //tant que les 2 joueurs n'ont pas reçu leur msg, on attend 15 sec
 		{
 			if (_client_one_tcp.send(winner_packet) != sf::Socket::Done)
 				cout << "winner_packet was not sent to P1" << endl;
@@ -138,15 +142,52 @@ void NetworkManager::send_win(NetworkManager::Players winner)
 		break;
 
 	case Player2: //si P2 a gagné
-		while (_client_two_tcp.receive(feedback2) != sf::Socket::Done || _client_one_tcp.receive(feedback1) != sf::Socket::Done)
+		while (timeout.getElapsedTime().asSeconds() < 15 && (_client_two_tcp.receive(feedback1) != sf::Socket::Done || _client_one_tcp.receive(feedback2) != sf::Socket::Done)) //tant que les 2 joueurs n'ont pas reçu leur msg, on attend 15 sec
 		{
 			if (_client_one_tcp.send(loser_packet) != sf::Socket::Done)
 				cout << "loser_packet was not sent to P1" << endl;
 
 			if (_client_two_tcp.send(winner_packet) != sf::Socket::Done)
 				cout << "winner_packet was not sent to P2" << endl;
+
 			_sleep(10);
 		}
 		break;
 	}
+
+	bool p1_is_game_continued,
+		p2_is_game_continued;
+
+	feedback1 >> p1_is_game_continued;
+	feedback2 >> p2_is_game_continued;
+	
+	bool is_game_continued = send_is_game_continued(p1_is_game_continued, p2_is_game_continued);
+
+	return is_game_continued;
+}
+
+bool NetworkManager::send_is_game_continued(bool p1_choice, bool p2_choice)
+{
+	_client_one_tcp.setBlocking(true);
+	_client_two_tcp.setBlocking(true);
+
+	bool is_game_continued = false;
+
+	if (p1_choice && p2_choice)
+	{
+		is_game_continued = true;
+	}
+
+	sf::Packet data;
+	sf::Uint8 which_data(2);
+
+	data << which_data << is_game_continued;
+
+	if (_client_one_tcp.send(data) != sf::Socket::Done)
+		cout << "is_game_continued were not sent to P1" << endl;
+
+	if (_client_two_tcp.send(data) != sf::Socket::Done)
+		cout << "Data were not sent to P2" << endl;
+
+	return is_game_continued;
 }

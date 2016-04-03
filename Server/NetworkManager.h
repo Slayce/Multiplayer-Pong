@@ -29,9 +29,11 @@ public:
 	InputReceived receive_input();
 	void send_data(Ball const &ball, Racket const &racket_one, Racket const &racket_two);
 
-	void send_win(Players winner);
+	bool send_win(Players winner);
 
 private:
+	bool send_is_game_continued(bool p1_choice, bool p2_choice);
+
 	sf::TcpSocket _client_one_tcp, _client_two_tcp;
 	sf::IpAddress _ip_client_one, _ip_client_two;
 	Port _local_tcp_port,
