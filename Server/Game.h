@@ -29,12 +29,17 @@ public:
 	void check_goal();
 	void read_inputs();
 	void send_data();
+	bool isGameContinued() { return _is_game_continued; }
 
 private:
+	void setIsGameContinued(bool is_game_continued) { _is_game_continued = is_game_continued; }
+	
 	Ball _ball;
 	Racket _racket_one, _racket_two;
 	NetworkManager _network_manager;
-	bool _is_game_ended;
+	bool _is_game_ended,
+		_is_game_continued;
+
 	bool _is_threads_terminated;
 	Vector2fSurcharged _window_dimensions;
 	EventKeyPressed _last_inputs_one,
