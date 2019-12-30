@@ -1,0 +1,8 @@
+A faire:
+
+
+News:
+Player: Choix de  recommencer ou non à la fin
+Server: Timeout à la fin
+
+Lien entre server/client
